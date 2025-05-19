@@ -62,16 +62,19 @@ stages:
     jobs:
       - job: deployWebApp
         displayName: 'Deploy no Serviço de Aplicativo'
-        steps: 
+        steps:
           - task: DownloadBuildArtifacts@1
             displayName: 'Baixar artefato gerado'
             inputs:
               buildType: 'current'
               downloadType: 'specific'
+              artifactName: '$(nome_artefato)'    # <-- Especifique o nome do artefato para garantir que baixe o certo
               downloadPath: '$(System.DefaultWorkingDirectory)'
+          - script: ls -R $(System.DefaultWorkingDirectory)/$(nome_artefato)
+            displayName: 'Listar arquivos do artefato baixado'
           - task: AzureRmWebAppDeployment@4
             displayName: 'Deploy SmartoothAi'
-            inputs: 
+            inputs:
               azureSubscription: 'MyAzureSubscription'
               appType: 'webAppLinux'
               WebAppName: $(app-name)
