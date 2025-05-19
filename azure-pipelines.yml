@@ -10,11 +10,11 @@ variables:
   rm: rm554113
   location: eastus
   resourceGroup: rg-smartoothai
-  service-plan: smartoothAi
-  app-name: smartooth-Ai-$(rm)
+  servicePlan: smartoothAi
+  appName: smartooth-Ai-$(rm)
   runtime: JAVA:17-java17
   sku: F1
-  nome_artefato: smartoothai
+  nome_artefato: SmartoothAI
 
 stages:
   - stage: criarInfra
@@ -29,13 +29,13 @@ stages:
               scriptLocation: 'inlineScript'
               inlineScript: |
                 az group create --location $(location) --name $(resourceGroup)
-                az appservice plan create -g $(resourceGroup) -n $(service-plan) --is-linux
-                az webapp create -g $(resourceGroup) -p $(service-plan) -n $(app-name) --runtime "$(runtime)"
-              visibleAzLogin: false
+                az appservice plan create -g $(resourceGroup) -n $(servicePlan) --is-linux
+                az webapp create -g $(resourceGroup) -p $(servicePlan) -n $(appName) --runtime "$(runtime)"
+            displayName: 'Criar Resource Group, App Service Plan e Web App'
 
   - stage: BuildApp
     variables:
-      gradleWrapperFile: 'smartoothai/gradlew'
+      gradleWrapperFile: 'gradlew'
     jobs:
       - job: buildApp
         displayName: 'Realizar build do App'
@@ -44,25 +44,15 @@ stages:
             displayName: 'Build SmartoothAi'
             inputs:
               gradleWrapperFile: '$(gradleWrapperFile)'
-              workingDirectory: 'smartoothai'
+              tasks: 'build'
               testRunTitle: 'Testes Unitários'
               jdkVersionOption: 1.17
 
-          - script: ls -R $(Build.SourcesDirectory)
-            displayName: 'Listar arquivos após build'
-
-          - script: |
-              if [ ! -f "$(Build.SourcesDirectory)/smartoothai/build/libs/SmartoothAI-0.0.1.jar" ]; then
-                echo "❌ .jar não encontrado!"
-                exit 1
-              fi
-            displayName: 'Verificar se o JAR foi gerado'
-
           - task: CopyFiles@2
-            displayName: 'Copiar a aplicação SmartoothAi'
+            displayName: 'Copiar o artefato SmartoothAi'
             inputs:
-              SourceFolder: '$(Build.SourcesDirectory)/smartoothai/build/libs'
-              Contents: 'SmartoothAI-0.0.1.jar'
+              SourceFolder: '$(System.DefaultWorkingDirectory)/SmartoothAI'
+              Contents: 'build/libs/SmartoothAI-0.0.1.jar'
               TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
           - task: PublishBuildArtifacts@1
@@ -81,7 +71,7 @@ stages:
             inputs:
               buildType: 'current'
               downloadType: 'specific'
-              artifactName: '$(nome_artefato)'
+              artifactName: $(nome_artefato)
               downloadPath: '$(System.DefaultWorkingDirectory)'
 
           - script: ls -R $(System.DefaultWorkingDirectory)/$(nome_artefato)
@@ -92,5 +82,5 @@ stages:
             inputs:
               azureSubscription: 'MyAzureSubscription'
               appType: 'webAppLinux'
-              WebAppName: $(app-name)
-              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/SmartoothAI-0.0.1.jar'
+              WebAppName: $(appName)
+              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/build/libs/SmartoothAI-0.0.1.jar'
