@@ -50,7 +50,7 @@ stages:
             displayName: 'Copiar a aplicação SmartoothAi'
             inputs:
               SourceFolder: '$(System.DefaultWorkingDirectory)'
-              Contents: 'build/libs/*.jar'
+              Contents: 'build/libs/SmartoothAI-0.0.1.jar'
               TargetFolder: '$(Build.ArtifactStagingDirectory)'
           - task: PublishBuildArtifacts@1
             displayName: 'Publicar artefato do Build SmartoothAi'
@@ -75,4 +75,4 @@ stages:
               azureSubscription: 'MyAzureSubscription'
               appType: 'webAppLinux'
               WebAppName: $(app-name)
-              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/build/libs/*.jar'
+              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/SmartoothAI-0.0.1.jar'
