@@ -10,8 +10,8 @@ variables:
   rm: rm554113
   location: eastus
   resourceGroup: rg-smartoothai
-  service-plan: smartoothAi
-  app-name: smartooth-Ai-$(rm)
+  servicePlan: smartoothAi            # tirei hífen
+  appName: smartooth-Ai-$(rm)         # tirei hífen
   runtime: JAVA:17-java17
   sku: F1
   nome_artefato: smartoothai
@@ -29,8 +29,8 @@ stages:
               scriptLocation: 'inlineScript'
               inlineScript: |
                 az group create --location $(location) --name $(resourceGroup)
-                az appservice plan create -g $(resourceGroup) -n $(service-plan) --is-linux
-                az webapp create -g $(resourceGroup) -p $(service-plan) -n $(app-name) --runtime "$(runtime)"
+                az appservice plan create -g $(resourceGroup) -n $(servicePlan) --is-linux
+                az webapp create -g $(resourceGroup) -p $(servicePlan) -n $(appName) --runtime "$(runtime)"
               visibleAzLogin: false
 
   - stage: BuildApp
@@ -68,7 +68,7 @@ stages:
             inputs:
               buildType: 'current'
               downloadType: 'specific'
-              artifactName: '$(nome_artefato)'    # <-- Especifique o nome do artefato para garantir que baixe o certo
+              artifactName: $(nome_artefato)    # tirei aspas
               downloadPath: '$(System.DefaultWorkingDirectory)'
           - script: ls -R $(System.DefaultWorkingDirectory)/$(nome_artefato)
             displayName: 'Listar arquivos do artefato baixado'
@@ -77,5 +77,5 @@ stages:
             inputs:
               azureSubscription: 'MyAzureSubscription'
               appType: 'webAppLinux'
-              WebAppName: $(app-name)
+              WebAppName: $(appName)
               packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/SmartoothAI-0.0.1.jar'
