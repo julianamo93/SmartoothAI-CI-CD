@@ -14,7 +14,7 @@ variables:
   appName: smartooth-Ai-$(rm)
   runtime: JAVA:17-java17
   sku: F1
-  nome_artefato: SmartoothAI
+  nome_artefato: smartoothai
 
 stages:
   - stage: criarInfra
@@ -48,10 +48,13 @@ stages:
               testRunTitle: 'Testes Unitários'
               jdkVersionOption: 1.17
 
+          - script: ls -lR $(System.DefaultWorkingDirectory)
+            displayName: 'Listar conteúdo da pasta base (System.DefaultWorkingDirectory)'
+
           - task: CopyFiles@2
             displayName: 'Copiar o artefato SmartoothAi'
             inputs:
-              SourceFolder: '$(System.DefaultWorkingDirectory)/SmartoothAI'
+              SourceFolder: '$(System.DefaultWorkingDirectory)'
               Contents: 'build/libs/SmartoothAI-0.0.1.jar'
               TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
@@ -83,4 +86,4 @@ stages:
               azureSubscription: 'MyAzureSubscription'
               appType: 'webAppLinux'
               WebAppName: $(appName)
-              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/build/libs/SmartoothAI-0.0.1.jar'
+              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/SmartoothAI-0.0.1.jar'
