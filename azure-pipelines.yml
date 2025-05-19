@@ -1,0 +1,78 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  rm: rm554113
+  location: eastus
+  resourceGroup: rg-smartoothai
+  service-plan: smartoothAi
+  app-name: smartooth-Ai-$(rm)
+  runtime: JAVA:17-java17
+  sku: F1
+  nome_artefato: smartoothai
+
+stages:
+  - stage: criarInfra
+    jobs:
+      - job: criaWebApp
+        displayName: 'criar o Serviço de Aplicativo'
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'MyAzureSubscription'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az group create --location $(location) --name $(resourceGroup)
+                az appservice plan create -g $(resourceGroup) -n $(service-plan) --is-linux
+                az webapp create -g $(resourceGroup) -p $(service-plan) -n $(app-name) --runtime "$(runtime)"
+              visibleAzLogin: false
+
+  - stage: BuildApp
+    variables:
+      gradleWrapperFile: 'gradlew'
+    jobs:
+      - job: buildApp
+        displayName: 'Realizar build do App'
+        steps:
+          - task: Gradle@3
+            displayName: 'Build SmartoothAi'
+            inputs:
+              gradleWrapperFile: '$(gradleWrapperFile)'
+              testRunTitle: 'Testes Unitários'
+              jdkVersionOption: 1.17
+          - task: CopyFiles@2
+            displayName: 'Copiar a aplicação SmartoothAi'
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)'
+              Contents: 'build/libs/*.jar'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publicar artefato do Build SmartoothAi'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: $(nome_artefato)
+
+  - stage: deployApp
+    jobs:
+      - job: deployWebApp
+        displayName: 'Deploy no Serviço de Aplicativo'
+        steps: 
+          - task: DownloadBuildArtifacts@1
+            displayName: 'Baixar artefato gerado'
+            inputs:
+              buildType: 'current'
+              downloadType: 'specific'
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy SmartoothAi'
+            inputs: 
+              azureSubscription: 'MyAzureSubscription'
+              appType: 'webAppLinux'
+              WebAppName: $(app-name)
+              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/build/libs/*.jar'
