@@ -20,7 +20,7 @@ stages:
   - stage: criarInfra
     jobs:
       - job: criaWebApp
-        displayName: 'Criar Serviço de Aplicativo'
+        displayName: 'Criar o Serviço de Aplicativo'
         steps:
           - task: AzureCLI@2
             inputs:
@@ -31,55 +31,66 @@ stages:
                 az group create --location $(location) --name $(resourceGroup)
                 az appservice plan create -g $(resourceGroup) -n $(service-plan) --is-linux
                 az webapp create -g $(resourceGroup) -p $(service-plan) -n $(app-name) --runtime "$(runtime)"
-              displayName: 'Criar Infraestrutura'
+              visibleAzLogin: false
 
   - stage: BuildApp
+    variables:
+      gradleWrapperFile: 'smartoothai/gradlew'
     jobs:
       - job: buildApp
-        displayName: 'Build do App Java'
+        displayName: 'Realizar build do App'
         steps:
           - task: Gradle@3
-            displayName: 'Compilar aplicação com Gradle'
+            displayName: 'Build SmartoothAi'
             inputs:
-              gradleWrapperFile: 'gradlew'
-              tasks: 'build'
+              gradleWrapperFile: '$(gradleWrapperFile)'
+              workingDirectory: 'smartoothai'
+              testRunTitle: 'Testes Unitários'
               jdkVersionOption: 1.17
 
+          - script: ls -R $(Build.SourcesDirectory)
+            displayName: 'Listar arquivos após build'
+
+          - script: |
+              if [ ! -f "$(Build.SourcesDirectory)/smartoothai/build/libs/SmartoothAI-0.0.1.jar" ]; then
+                echo "❌ .jar não encontrado!"
+                exit 1
+              fi
+            displayName: 'Verificar se o JAR foi gerado'
+
           - task: CopyFiles@2
-            displayName: 'Copiar .jar para staging'
+            displayName: 'Copiar a aplicação SmartoothAi'
             inputs:
-              SourceFolder: '$(System.DefaultWorkingDirectory)/smartoothai/build/libs'
+              SourceFolder: '$(Build.SourcesDirectory)/smartoothai/build/libs'
               Contents: 'SmartoothAI-0.0.1.jar'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)/$(nome_artefato)'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
           - task: PublishBuildArtifacts@1
-            displayName: 'Publicar artefato'
+            displayName: 'Publicar artefato do Build SmartoothAi'
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(nome_artefato)'
-              ArtifactName: '$(nome_artefato)'
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: $(nome_artefato)
 
   - stage: deployApp
     jobs:
       - job: deployWebApp
-        displayName: 'Deploy no Azure WebApp'
+        displayName: 'Deploy no Serviço de Aplicativo'
         steps:
           - task: DownloadBuildArtifacts@1
-            displayName: 'Baixar artefato do build'
+            displayName: 'Baixar artefato gerado'
             inputs:
               buildType: 'current'
               downloadType: 'specific'
               artifactName: '$(nome_artefato)'
               downloadPath: '$(System.DefaultWorkingDirectory)'
 
-          - script: |
-              echo "Arquivos do artefato baixado:"
-              ls -R $(System.DefaultWorkingDirectory)/$(nome_artefato)
-            displayName: 'Listar arquivos baixados'
+          - script: ls -R $(System.DefaultWorkingDirectory)/$(nome_artefato)
+            displayName: 'Listar arquivos do artefato baixado'
 
           - task: AzureRmWebAppDeployment@4
-            displayName: 'Realizar deploy do .jar'
+            displayName: 'Deploy SmartoothAi'
             inputs:
               azureSubscription: 'MyAzureSubscription'
               appType: 'webAppLinux'
-              WebAppName: '$(app-name)'
+              WebAppName: $(app-name)
               packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/SmartoothAI-0.0.1.jar'
