@@ -40,7 +40,7 @@ https://youtu.be/2XcoVLipeoc
 ## Pipeline YAML CI/CD Azure
 
 Pipeline YAML CI/CD criado com Azure DevOps; Foi criada uma infraestrutura, build e deploy da aplicação java com .JAR, 
-além da criação de um banco de dados SQL Database Azure para inserção e persistência de dados na nuvem.
+além da criação de um banco de dados Azure SQL Database para inserção e persistência de dados na nuvem, validados via Postman.
 
 ### Pipeline
 ```bash
