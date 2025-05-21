@@ -10,10 +10,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlanoService {
@@ -36,6 +38,8 @@ public class PlanoService {
 
     @Transactional
     public ResponseEntity<String> createPlano(PlanoDTO planoDTO) {
+        log.info("Criando plano para usuarioPacienteId = {}", planoDTO.getUsuarioPacienteId());
+
         UsuarioPaciente usuarioPaciente = usuarioPacienteRepository.findById(planoDTO.getUsuarioPacienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário Paciente não encontrado com o ID: " + planoDTO.getUsuarioPacienteId()));
 
