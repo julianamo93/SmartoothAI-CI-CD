@@ -16,9 +16,9 @@ Neste repositório encontra-se a API responsável pelo gerenciamento de profissi
 
 ## 🪐 Developers 
 
-- [Sabrina Couto](https://github.com/sabrinacouto) - Backend Developer - RM552728 - 2TDSZ
-- [Juliana Mo.](https://github.com/julianamo93) - Modelagem de Dados e Cloud - RM554113 -2TDSPR
+- [Juliana Moreira](https://github.com/julianamo93) - Modelagem de Dados e Cloud - RM554113 - 2TDSPR
 - [Kevin Nobre](https://github.com/KevinNobre) - Backend e Front - RM552590 - 2TDSZ
+- [Sabrina Couto](https://github.com/sabrinacouto) - Backend Developer - RM552728 - 2TDSZ
   
 
 ## Modelo DER
@@ -36,6 +36,109 @@ Neste repositório encontra-se a API responsável pelo gerenciamento de profissi
 ## Vídeo da Solução
 
 https://youtu.be/2XcoVLipeoc
+
+## Pipeline YAML CI/CD Azure
+
+Pipeline YAML CI/CD criado com Azure DevOps; Foi criada uma infraestrutura, build e deploy da aplicação java com .JAR, 
+além da criação de um banco de dados SQL Database Azure para inserção e persistência de dados na nuvem.
+
+### Pipeline
+```bash
+  trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  rm: rm554113
+  location: eastus
+  resourceGroup: rg-smartoothai
+  servicePlan: smartoothAi
+  appName: smartooth-Ai-$(rm)
+  runtime: JAVA|17-java17
+  sku: F1
+  nome_artefato: smartoothai
+
+  SPRING_DATASOURCE_URL: 'jdbc:sqlserver://svr-dbsprint4.database.windows.net:1433;databaseName=db-sprint4;encrypt=true;trustServerCertificate=false;loginTimeout=30;'
+  SPRING_DATASOURCE_USERNAME: 'USER'
+  SPRING_DATASOURCE_PASSWORD: 'PASSWORD'
+  SPRING_JPA_HIBERNATE_DDL_AUTO: 'none'
+
+stages:
+  - stage: criarInfra
+    jobs:
+      - job: criaWebApp
+        displayName: 'Criar o Serviço de Aplicativo'
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'MyAzureSubscription'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az group create --location $(location) --name $(resourceGroup)
+                az appservice plan create -g $(resourceGroup) -n $(servicePlan) --is-linux --sku F1
+                az webapp create -g $(resourceGroup) -p $(servicePlan) -n $(appName) --runtime "$(runtime)"
+            displayName: 'Criar Resource Group, App Service Plan e Web App'
+
+  - stage: BuildApp
+    variables:
+      gradleWrapperFile: 'gradlew'
+    jobs:
+      - job: buildApp
+        displayName: 'Realizar build do App'
+        steps:
+          - task: Gradle@3
+            displayName: 'Build SmartoothAi'
+            inputs:
+              gradleWrapperFile: '$(gradleWrapperFile)'
+              tasks: 'build'
+              testRunTitle: 'Testes Unitários'
+              jdkVersionOption: 1.17
+
+          - script: ls -lR $(System.DefaultWorkingDirectory)
+            displayName: 'Listar conteúdo da pasta base (System.DefaultWorkingDirectory)'
+
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)/build/libs'
+              Contents: 'SmartoothAI-0.0.1.jar'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publicar artefato do Build SmartoothAi'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: $(nome_artefato)
+
+  - stage: deployApp
+    jobs:
+      - job: deployWebApp
+        displayName: 'Deploy no Serviço de Aplicativo'
+        steps:
+          - task: DownloadBuildArtifacts@1
+            displayName: 'Baixar artefato gerado'
+            inputs:
+              buildType: 'current'
+              downloadType: 'specific'
+              artifactName: $(nome_artefato)
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+
+          - script: ls -R $(System.DefaultWorkingDirectory)/$(nome_artefato)
+            displayName: 'Listar arquivos do artefato baixado'
+
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy SmartoothAi'
+            inputs:
+              azureSubscription: 'MyAzureSubscription'
+              appType: 'webAppLinux'
+              WebAppName: $(appName)
+              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/SmartoothAI-0.0.1.jar'
+```
+![image](https://github.com/user-attachments/assets/668a7c70-420e-4b02-b742-48b4c96f88b9)
 
 
 ## 💬 Rodando localmente
