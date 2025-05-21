@@ -52,10 +52,9 @@ stages:
             displayName: 'Listar conteúdo da pasta base (System.DefaultWorkingDirectory)'
 
           - task: CopyFiles@2
-            displayName: 'Copiar o artefato SmartoothAi'
             inputs:
-              SourceFolder: '$(System.DefaultWorkingDirectory)'
-              Contents: 'build/libs/SmartoothAI-0.0.1.jar'
+              SourceFolder: '$(System.DefaultWorkingDirectory)/build/libs'
+              Contents: 'SmartoothAI-0.0.1.jar'
               TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
           - task: PublishBuildArtifacts@1
