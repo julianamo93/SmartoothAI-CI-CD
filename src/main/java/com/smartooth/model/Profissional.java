@@ -10,8 +10,7 @@ import java.util.Date;
 public class Profissional {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profissional_seq")
-    @SequenceGenerator(name = "profissional_seq", sequenceName = "seq_profissional_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "profissional_id")
     private Long profissionalId;
     private String nome;

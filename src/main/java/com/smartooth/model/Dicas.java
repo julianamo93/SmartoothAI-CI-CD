@@ -6,10 +6,7 @@ import lombok.Data;
 @Table(name = "tb_dicas")
 public class Dicas {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-            "dica_seq")
-    @SequenceGenerator(name = "dica_seq", sequenceName = "seq_dica_id",
-            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dica_id")
     private Long dicaId;
     @Column(name = "descricao", length = 255)

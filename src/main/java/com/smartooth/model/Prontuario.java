@@ -17,8 +17,7 @@ import java.util.Date;
 public class Prontuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "prontuario_seq")
-    @SequenceGenerator(name = "prontuario_seq", sequenceName = "seq_prontuario_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prontuario_id")
     private Long prontuarioId;
 

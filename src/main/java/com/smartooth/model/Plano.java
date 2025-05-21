@@ -10,8 +10,7 @@ import lombok.Data;
 public class Plano {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "plano_seq")
-    @SequenceGenerator(name = "plano_seq", sequenceName = "seq_plano_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "plano_id")
     private Long planoId;
 

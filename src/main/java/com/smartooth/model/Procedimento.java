@@ -9,8 +9,7 @@ import lombok.Data;
 public class Procedimento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "procedimento_seq")
-    @SequenceGenerator(name = "procedimento_seq", sequenceName = "seq_procedimento_id", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "procedimento_id")
     private Long procedimentoId;
 
