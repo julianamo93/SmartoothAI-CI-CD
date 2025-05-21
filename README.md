@@ -42,6 +42,26 @@ https://youtu.be/2XcoVLipeoc
 Pipeline YAML CI/CD criado com Azure DevOps; Foi criada uma infraestrutura, build e deploy da aplicação java com .JAR, 
 além da criação de um banco de dados Azure SQL Database para inserção e persistência de dados na nuvem, validados via Postman.
 
+### Etapas do Pipeline
+🔁 Trigger
+Acionada automaticamente em pushs para a branch main.
+
+🛠️ 1. Criar Infraestrutura (Stage: criarInfra)
+Azure CLI é utilizado para:
+- Criar o Resource Group.
+- Criar o App Service Plan Linux (F1 – gratuito).
+- Criar o Web App com runtime Java 17.
+
+🔨 2. Build da Aplicação (Stage: BuildApp)
+- Compila o projeto usando o Gradle.
+- Lista arquivos para verificação.
+Copia o .jar gerado e publica como artefato.
+
+🚀 3. Deploy da Aplicação (Stage: deployApp)
+- Faz o download do artefato publicado.
+- Lista os arquivos para conferência.
+Usa o AzureRmWebAppDeployment para fazer deploy no Azure Web App.
+
 ### Pipeline
 ```bash
   trigger:
