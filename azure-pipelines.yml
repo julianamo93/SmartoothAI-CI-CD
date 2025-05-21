@@ -12,7 +12,7 @@ variables:
   resourceGroup: rg-smartoothai
   servicePlan: smartoothAi
   appName: smartooth-Ai-$(rm)
-  runtime: JAVA:17-java17
+  runtime: JAVA|17-java17
   sku: F1
   nome_artefato: smartoothai
 
@@ -29,7 +29,7 @@ stages:
               scriptLocation: 'inlineScript'
               inlineScript: |
                 az group create --location $(location) --name $(resourceGroup)
-                az appservice plan create -g $(resourceGroup) -n $(servicePlan) --is-linux
+                az appservice plan create -g $(resourceGroup) -n $(servicePlan) --is-linux --sku F1
                 az webapp create -g $(resourceGroup) -p $(servicePlan) -n $(appName) --runtime "$(runtime)"
             displayName: 'Criar Resource Group, App Service Plan e Web App'
 
@@ -86,4 +86,4 @@ stages:
               azureSubscription: 'MyAzureSubscription'
               appType: 'webAppLinux'
               WebAppName: $(appName)
-              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/**/*.jar'
+              packageForLinux: '$(System.DefaultWorkingDirectory)/$(nome_artefato)/SmartoothAI-0.0.1.jar'
