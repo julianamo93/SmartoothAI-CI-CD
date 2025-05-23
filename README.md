@@ -35,7 +35,7 @@ Neste repositório encontra-se a API responsável pelo gerenciamento de profissi
 
 ## Vídeo da Solução
 
-https://youtu.be/2XcoVLipeoc
+[https://youtu.be/2XcoVLipeoc](https://www.youtube.com/watch?v=xa1YPsNZ9Xw)
 
 ## Pipeline YAML CI/CD Azure
 
