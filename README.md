@@ -19,19 +19,13 @@ Neste repositório encontra-se a API responsável pelo gerenciamento de profissi
 - [Juliana Moreira](https://github.com/julianamo93) - Modelagem de Dados e Cloud - RM554113 - 2TDSPR
 - [Kevin Nobre](https://github.com/KevinNobre) - Backend e Front - RM552590 - 2TDSZ
 - [Sabrina Couto](https://github.com/sabrinacouto) - Backend Developer - RM552728 - 2TDSZ
-  
-
-## Modelo DER
-![Captura de tela 2025-03-20 011231](https://github.com/user-attachments/assets/36285977-ae30-4380-9130-78dac38aca5b)
-
-
-## Diagrama de Classes
-
-![Captura de tela 2025-03-19 231027](https://github.com/user-attachments/assets/3a23b5c3-2b11-4f0e-ae2b-79eaebf75e56)
 
 ## Arquitetura da Solução
-
 [Smartooth-Archi.pdf](https://github.com/user-attachments/files/19358853/Smartooth-Archi.pdf)
+  
+## Arquitetura Pipeline YAML - Azure
+![image](https://github.com/user-attachments/assets/e3c6f76b-b9b9-4a1f-b555-a18fb5b9bb39)
+
 
 ## Vídeo da Solução
 
